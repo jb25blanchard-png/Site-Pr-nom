@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mini site</title>
+
+  <style>
+    body {
+      font-family: system-ui, Arial, sans-serif;
+      margin: 32px;
+    }
+
+    .box {
+      max-width: 520px;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 16px;
+    }
+
+    input#answer {
+      width: 100%;
+      padding: 14px;
+      font-size: 18px;
+      border: 2px solid #bbb;
+      border-radius: 12px;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 150ms, box-shadow 150ms;
+    }
+
+    .ok input#answer {
+      border-color: #1a7f37;
+      box-shadow: 0 0 18px rgba(26,127,55,.35);
+    }
+
+    .bad input#answer {
+      border-color: #d1242f;
+      box-shadow: 0 0 18px rgba(209,36,47,.25);
+    }
+
+    .msg {
+      margin-top: 14px;
+      font-size: 18px;
+      min-height: 26px;
+    }
+
+    .hint {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Entre la réponse</h1>
+
+  <div class="box" id="wrap">
+    <input
+      id="answer"
+      type="password"
+      placeholder="Tape ta réponse puis appuie sur Entrée"
+      autocomplete="off"
+    />
+
+    <div class="msg" id="msg"></div>
+    <div class="hint">Validation uniquement avec la touche Entrée</div>
+  </div>
+
+  <script>
+    // 🔒 Modifie ici la bonne réponse
+    const SECRET = "DIANE";
+
+    const wrap = document.getElementById("wrap");
+    const input = document.getElementById("answer");
+    const msg = document.getElementById("msg");
+
+    function normalize(text) {
+      return (text || "").trim().toUpperCase();
+    }
+
+    function resetState() {
+      wrap.classList.remove("ok", "bad");
+      msg.textContent = "";
+    }
+
+    const failureMessages = [
+  "Pas encore, mais tu peux réessayer 🙂",
+  "Ce n’est pas la bonne réponse, continue !",
+  "Presque… enfin pas encore 😉",
+  "Raté cette fois, mais ne lâche pas.",
+  "Ce n’est pas ça, essaie autrement.",
+  "Mauvaise réponse, mais tu es sur la bonne voie.",
+  "Non, mais rien n’est perdu !",
+  "Ce n’est pas correct pour l’instant.",
+  "Pas exactement, retente ta chance.",
+  "Dommage… mais la solution existe 😉",
+  "Ce n’est pas encore la bonne combinaison.",
+  "Essaie encore, tu te rapproches peut-être.",
+  "Ce n’est pas la réponse attendue.",
+  "Pas cette fois, mais continue !",
+  "Ce n’est pas ça, prends ton temps.",
+  "Encore un effort, tu vas y arriver.",
+  "Ce n’est pas correct, mais persévère.",
+  "La réponse n’est pas celle-ci.",
+  "Ce n’est pas gagné, mais rien n’est perdu.",
+  "Essai incorrect — une autre tentative ?"
+];
+
+
+function randomFailureMessage() {
+  return failureMessages[
+    Math.floor(Math.random() * failureMessages.length)
+  ];
+}
+
+function checkAnswer() {
+  const value = normalize(input.value);
+
+  if (!value) return;
+
+  if (value === normalize(SECRET)) {
+    wrap.classList.remove("bad");
+    wrap.classList.add("ok");
+    msg.textContent = "🎉 Bravo, tu as trouvé la bonne réponse !";
+  } else {
+    wrap.classList.remove("ok");
+    wrap.classList.add("bad");
+    msg.textContent = randomFailureMessage();
+  }
+}
+
+
+    // 🔑 Validation uniquement avec ENTER
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        checkAnswer();
+      } else {
+        // si l’utilisateur recommence à taper → on enlève la couleur
+        resetState();
+      }
+    });
+
+    input.focus();
+  </script>
+
+</body>
+</html>
