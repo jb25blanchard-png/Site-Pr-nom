@@ -16,6 +16,9 @@
       padding: 20px;
       border: 1px solid #ddd;
       border-radius: 16px;
+      position: relative;
+      z-index: 1;
+      background: white;
     }
 
     input#answer {
@@ -50,6 +53,72 @@
       font-size: 14px;
       color: #666;
     }
+
+    /* === Effets victoire (feux + confettis + image) === */
+    #fx {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9998;
+      display: none;
+    }
+
+    #confetti {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 9999;
+      display: none;
+    }
+
+    .confetto {
+      position: absolute;
+      top: -12px;
+      width: 10px;
+      height: 14px;
+      opacity: 0.95;
+      transform: rotate(0deg);
+      animation-name: confettiFall;
+      animation-timing-function: linear;
+      animation-fill-mode: forwards;
+    }
+
+    @keyframes confettiFall {
+      to {
+        transform: translateY(110vh) rotate(540deg);
+        opacity: 0.25;
+      }
+    }
+
+    .winCard {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%) scale(0.92);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 10000;
+      transition: 220ms ease;
+      background: rgba(255,255,255,0.92);
+      border: 1px solid rgba(0,0,0,0.12);
+      border-radius: 18px;
+      padding: 12px;
+      max-width: min(420px, 84vw);
+      box-shadow: 0 18px 60px rgba(0,0,0,0.22);
+    }
+
+    .winCard.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .winCard img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 14px;
+    }
   </style>
 </head>
 <body>
@@ -68,13 +137,43 @@
     <div class="hint">Validation uniquement avec la touche Entrée</div>
   </div>
 
+  <!-- Feux d’artifice -->
+  <canvas id="fx"></canvas>
+
+  <!-- Confettis -->
+  <div id="confetti"></div>
+
+  <!-- Image de victoire -->
+  <div id="winCard" class="winCard" aria-hidden="true">
+    <img id="winImg" alt="Victoire" />
+  </div>
+
   <script>
     // 🔒 Modifie ici la bonne réponse
     const SECRET = "DIANE";
 
+    // 🖼️ Image à afficher en cas de réussite
+    // Mets un fichier dans ton dépôt : assets/victoire.png (recommandé)
+    // ou remplace par une URL https://...
+    const WIN_IMAGE_SRC = "assets/victoire.png";
+
     const wrap = document.getElementById("wrap");
     const input = document.getElementById("answer");
     const msg = document.getElementById("msg");
+
+    // FX layers
+    const fxCanvas = document.getElementById("fx");
+    const fxCtx = fxCanvas.getContext("2d");
+    const confettiLayer = document.getElementById("confetti");
+    const winCard = document.getElementById("winCard");
+    const winImg = document.getElementById("winImg");
+
+    function resizeFx() {
+      fxCanvas.width = window.innerWidth;
+      fxCanvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resizeFx);
+    resizeFx();
 
     function normalize(text) {
       return (text || "").trim().toUpperCase();
@@ -86,64 +185,201 @@
     }
 
     const failureMessages = [
-  "Pas encore, mais tu peux réessayer 🙂",
-  "Ce n’est pas la bonne réponse, continue !",
-  "Presque… enfin pas encore 😉",
-  "Raté cette fois, mais ne lâche pas.",
-  "Ce n’est pas ça, essaie autrement.",
-  "Mauvaise réponse, mais tu es sur la bonne voie.",
-  "Non, mais rien n’est perdu !",
-  "Ce n’est pas correct pour l’instant.",
-  "Pas exactement, retente ta chance.",
-  "Dommage… mais la solution existe 😉",
-  "Ce n’est pas encore la bonne combinaison.",
-  "Essaie encore, tu te rapproches peut-être.",
-  "Ce n’est pas la réponse attendue.",
-  "Pas cette fois, mais continue !",
-  "Ce n’est pas ça, prends ton temps.",
-  "Encore un effort, tu vas y arriver.",
-  "Ce n’est pas correct, mais persévère.",
-  "La réponse n’est pas celle-ci.",
-  "Ce n’est pas gagné, mais rien n’est perdu.",
-  "Essai incorrect — une autre tentative ?"
-];
+      "Pas encore, mais tu peux réessayer 🙂",
+      "Ce n’est pas la bonne réponse, continue !",
+      "Presque… enfin pas encore 😉",
+      "Raté cette fois, mais ne lâche pas.",
+      "Ce n’est pas ça, essaie autrement.",
+      "Mauvaise réponse, mais tu es sur la bonne voie.",
+      "Non, mais rien n’est perdu !",
+      "Ce n’est pas correct pour l’instant.",
+      "Pas exactement, retente ta chance.",
+      "Dommage… mais la solution existe 😉",
+      "Ce n’est pas encore la bonne combinaison.",
+      "Essaie encore, tu te rapproches peut-être.",
+      "Ce n’est pas la réponse attendue.",
+      "Pas cette fois, mais continue !",
+      "Ce n’est pas ça, prends ton temps.",
+      "Encore un effort, tu vas y arriver.",
+      "Ce n’est pas correct, mais persévère.",
+      "La réponse n’est pas celle-ci.",
+      "Ce n’est pas gagné, mais rien n’est perdu.",
+      "Essai incorrect — une autre tentative ?"
+    ];
 
+    function randomFailureMessage() {
+      return failureMessages[Math.floor(Math.random() * failureMessages.length)];
+    }
 
-function randomFailureMessage() {
-  return failureMessages[
-    Math.floor(Math.random() * failureMessages.length)
-  ];
-}
+    function showWinImage() {
+      winImg.src = WIN_IMAGE_SRC;
+      winCard.classList.add("show");
+      winCard.setAttribute("aria-hidden", "false");
 
-function checkAnswer() {
-  const value = normalize(input.value);
+    }
 
-  if (!value) return;
+    function launchConfetti(durationMs = 3600) {
+      confettiLayer.innerHTML = "";
+      confettiLayer.style.display = "block";
 
-  if (value === normalize(SECRET)) {
-    wrap.classList.remove("bad");
-    wrap.classList.add("ok");
-    msg.textContent = "🎉 Bravo, tu as trouvé la bonne réponse !";
-  } else {
-    wrap.classList.remove("ok");
-    wrap.classList.add("bad");
-    msg.textContent = randomFailureMessage();
-  }
-}
+      const colors = ["#22c55e", "#16a34a", "#f97316", "#eab308", "#3b82f6", "#a855f7", "#ef4444"];
+      const start = Date.now();
 
+      function spawnBatch() {
+        const now = Date.now();
+        if (now - start > durationMs) {
+          setTimeout(() => {
+            confettiLayer.style.display = "none";
+            confettiLayer.innerHTML = "";
+          }, 1200);
+          return;
+        }
+
+        const batch = 14;
+        for (let i = 0; i < batch; i++) {
+          const c = document.createElement("div");
+          c.className = "confetto";
+
+          const size = 6 + Math.random() * 10;
+          c.style.width = size + "px";
+          c.style.height = (size * 1.4) + "px";
+
+          c.style.left = (Math.random() * 100) + "vw";
+          c.style.background = colors[Math.floor(Math.random() * colors.length)];
+
+          const fallMs = 1100 + Math.random() * 1700;
+          c.style.animationDuration = fallMs + "ms";
+          c.style.animationDelay = (Math.random() * 120) + "ms";
+          c.style.borderRadius = (Math.random() * 6) + "px";
+
+          confettiLayer.appendChild(c);
+          setTimeout(() => c.remove(), fallMs + 300);
+        }
+
+        requestAnimationFrame(spawnBatch);
+      }
+
+      requestAnimationFrame(spawnBatch);
+    }
+
+    function launchFireworks(durationMs = 3200) {
+      fxCanvas.style.display = "block";
+
+      const particles = [];
+      const burstsPerSecond = 5;
+      const start = performance.now();
+
+      function rand(min, max) { return min + Math.random() * (max - min); }
+
+      function makeBurst() {
+        const x = rand(fxCanvas.width * 0.15, fxCanvas.width * 0.85);
+        const y = rand(fxCanvas.height * 0.12, fxCanvas.height * 0.45);
+
+        const count = Math.floor(rand(45, 75));
+        for (let i = 0; i < count; i++) {
+          const angle = rand(0, Math.PI * 2);
+          const speed = rand(2.2, 6.2);
+
+          const p = {
+            x, y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            life: rand(40, 70),
+            maxLife: 0,
+            size: rand(1.2, 2.6),
+            h: rand(0, 360),
+            a: 1
+          };
+          p.maxLife = p.life;
+          particles.push(p);
+        }
+      }
+
+      let lastBurst = 0;
+
+      function tick(t) {
+        const elapsed = t - start;
+
+        // fond semi-transparent pour traînées
+        fxCtx.fillStyle = "rgba(0,0,0,0.18)";
+        fxCtx.fillRect(0, 0, fxCanvas.width, fxCanvas.height);
+
+        // lancer des bursts pendant la durée
+        if (elapsed < durationMs) {
+          if (t - lastBurst > 1000 / burstsPerSecond) {
+            makeBurst();
+            lastBurst = t;
+          }
+        }
+
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+
+          p.x += p.vx;
+          p.y += p.vy;
+
+          p.vx *= 0.985;
+          p.vy = p.vy * 0.985 + 0.06;
+
+          p.life -= 1;
+          p.a = Math.max(0, p.life / p.maxLife);
+
+          fxCtx.beginPath();
+          fxCtx.fillStyle = `hsla(${p.h}, 95%, 60%, ${p.a})`;
+          fxCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          fxCtx.fill();
+
+          if (p.life <= 0) particles.splice(i, 1);
+        }
+
+        if (elapsed > durationMs && particles.length === 0) {
+          fxCanvas.style.display = "none";
+          fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+          return;
+        }
+
+        requestAnimationFrame(tick);
+      }
+
+      requestAnimationFrame(tick);
+    }
+
+    function celebrateWin() {
+      launchFireworks(3200);
+      launchConfetti(3600);
+      showWinImage();
+    }
+
+    function checkAnswer() {
+      const value = normalize(input.value);
+      if (!value) return;
+
+      if (value === normalize(SECRET)) {
+        wrap.classList.remove("bad");
+        wrap.classList.add("ok");
+        msg.textContent = "🎉 Bravo, tu as trouvé la bonne réponse !";
+        celebrateWin(); // 🎆🎉🖼️
+      } else {
+        wrap.classList.remove("ok");
+        wrap.classList.add("bad");
+        msg.textContent = randomFailureMessage();
+      }
+    }
 
     // 🔑 Validation uniquement avec ENTER
     input.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
         checkAnswer();
       } else {
-        // si l’utilisateur recommence à taper → on enlève la couleur
         resetState();
       }
     });
 
     input.focus();
   </script>
+</body>
+</html>
+
 
 </body>
 </html>
