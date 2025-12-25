@@ -54,7 +54,6 @@
       color: #666;
     }
 
-    /* === Effets victoire (feux + confettis + image) === */
     #fx {
       position: fixed;
       inset: 0;
@@ -78,7 +77,6 @@
       width: 10px;
       height: 14px;
       opacity: 0.95;
-      transform: rotate(0deg);
       animation-name: confettiFall;
       animation-timing-function: linear;
       animation-fill-mode: forwards;
@@ -119,6 +117,14 @@
       height: auto;
       border-radius: 14px;
     }
+
+    .winText {
+      margin: 14px 6px 4px;
+      font-size: 18px;
+      line-height: 1.4;
+      text-align: center;
+      color: #111;
+    }
   </style>
 </head>
 <body>
@@ -137,36 +143,31 @@
     <div class="hint">Validation uniquement avec la touche Entrée</div>
   </div>
 
-  <!-- Feux d’artifice -->
   <canvas id="fx"></canvas>
-
-  <!-- Confettis -->
   <div id="confetti"></div>
 
-  <!-- Image de victoire -->
   <div id="winCard" class="winCard" aria-hidden="true">
-    <img id="winImg" alt="BRAVO" />
+    <img id="winImg" alt="Bravo" />
+    <p class="winText">Un prénom est révélé. Une autre étoile reste à nommer.</p>
   </div>
 
   <script>
-    // 🔒 Modifie ici la bonne réponse
     const SECRET = "DIANE";
 
-    // 🖼️ Image à afficher en cas de réussite
-    // Mets un fichier dans ton dépôt : assets/victoire.png (recommandé)
-    // ou remplace par une URL https://...
-    const WIN_IMAGE_SRC = "assets/victoire.png";
+    // ✅ chemin avec accent
+    const WIN_IMAGE_SRC = "assets/étoiles.png";
 
     const wrap = document.getElementById("wrap");
     const input = document.getElementById("answer");
     const msg = document.getElementById("msg");
 
-    // FX layers
     const fxCanvas = document.getElementById("fx");
     const fxCtx = fxCanvas.getContext("2d");
     const confettiLayer = document.getElementById("confetti");
     const winCard = document.getElementById("winCard");
     const winImg = document.getElementById("winImg");
+
+    let solved = false;
 
     function resizeFx() {
       fxCanvas.width = window.innerWidth;
@@ -194,28 +195,17 @@
       "Non, mais rien n’est perdu !",
       "Ce n’est pas correct pour l’instant.",
       "Pas exactement, retente ta chance.",
-      "Dommage… mais la solution existe 😉",
-      "Ce n’est pas encore la bonne combinaison.",
-      "Essaie encore, tu te rapproches peut-être.",
-      "Ce n’est pas la réponse attendue.",
-      "Pas cette fois, mais continue !",
-      "Ce n’est pas ça, prends ton temps.",
-      "Encore un effort, tu vas y arriver.",
-      "Ce n’est pas correct, mais persévère.",
-      "La réponse n’est pas celle-ci.",
-      "Ce n’est pas gagné, mais rien n’est perdu.",
-      "Essai incorrect — une autre tentative ?"
+      "Dommage… mais la solution existe 😉"
     ];
 
     function randomFailureMessage() {
       return failureMessages[Math.floor(Math.random() * failureMessages.length)];
     }
 
-    function showWinImage() {
+    function showWinCard() {
       winImg.src = WIN_IMAGE_SRC;
       winCard.classList.add("show");
       winCard.setAttribute("aria-hidden", "false");
-
     }
 
     function launchConfetti(durationMs = 3600) {
@@ -226,8 +216,7 @@
       const start = Date.now();
 
       function spawnBatch() {
-        const now = Date.now();
-        if (now - start > durationMs) {
+        if (Date.now() - start > durationMs) {
           setTimeout(() => {
             confettiLayer.style.display = "none";
             confettiLayer.innerHTML = "";
@@ -235,25 +224,18 @@
           return;
         }
 
-        const batch = 14;
-        for (let i = 0; i < batch; i++) {
+        for (let i = 0; i < 14; i++) {
           const c = document.createElement("div");
           c.className = "confetto";
-
           const size = 6 + Math.random() * 10;
           c.style.width = size + "px";
-          c.style.height = (size * 1.4) + "px";
-
-          c.style.left = (Math.random() * 100) + "vw";
+          c.style.height = size * 1.4 + "px";
+          c.style.left = Math.random() * 100 + "vw";
           c.style.background = colors[Math.floor(Math.random() * colors.length)];
-
-          const fallMs = 1100 + Math.random() * 1700;
-          c.style.animationDuration = fallMs + "ms";
-          c.style.animationDelay = (Math.random() * 120) + "ms";
-          c.style.borderRadius = (Math.random() * 6) + "px";
-
+          c.style.animationDuration = 1100 + Math.random() * 1700 + "ms";
+          c.style.animationDelay = Math.random() * 120 + "ms";
           confettiLayer.appendChild(c);
-          setTimeout(() => c.remove(), fallMs + 300);
+          setTimeout(() => c.remove(), 2200);
         }
 
         requestAnimationFrame(spawnBatch);
@@ -264,68 +246,47 @@
 
     function launchFireworks(durationMs = 3200) {
       fxCanvas.style.display = "block";
-
       const particles = [];
-      const burstsPerSecond = 5;
       const start = performance.now();
 
-      function rand(min, max) { return min + Math.random() * (max - min); }
+      function rand(a, b) { return a + Math.random() * (b - a); }
 
-      function makeBurst() {
+      function burst() {
         const x = rand(fxCanvas.width * 0.15, fxCanvas.width * 0.85);
         const y = rand(fxCanvas.height * 0.12, fxCanvas.height * 0.45);
-
-        const count = Math.floor(rand(45, 75));
-        for (let i = 0; i < count; i++) {
-          const angle = rand(0, Math.PI * 2);
-          const speed = rand(2.2, 6.2);
-
-          const p = {
+        for (let i = 0; i < 60; i++) {
+          particles.push({
             x, y,
-            vx: Math.cos(angle) * speed,
-            vy: Math.sin(angle) * speed,
-            life: rand(40, 70),
-            maxLife: 0,
+            vx: Math.cos(Math.random() * Math.PI * 2) * rand(2, 6),
+            vy: Math.sin(Math.random() * Math.PI * 2) * rand(2, 6),
+            life: 60,
             size: rand(1.2, 2.6),
-            h: rand(0, 360),
-            a: 1
-          };
-          p.maxLife = p.life;
-          particles.push(p);
+            h: Math.random() * 360
+          });
         }
       }
 
-      let lastBurst = 0;
+      let last = 0;
 
       function tick(t) {
         const elapsed = t - start;
-
-        // fond semi-transparent pour traînées
         fxCtx.fillStyle = "rgba(0,0,0,0.18)";
         fxCtx.fillRect(0, 0, fxCanvas.width, fxCanvas.height);
 
-        // lancer des bursts pendant la durée
-        if (elapsed < durationMs) {
-          if (t - lastBurst > 1000 / burstsPerSecond) {
-            makeBurst();
-            lastBurst = t;
-          }
+        if (elapsed < durationMs && t - last > 200) {
+          burst();
+          last = t;
         }
 
         for (let i = particles.length - 1; i >= 0; i--) {
           const p = particles[i];
-
           p.x += p.vx;
           p.y += p.vy;
+          p.vy += 0.06;
+          p.life--;
 
-          p.vx *= 0.985;
-          p.vy = p.vy * 0.985 + 0.06;
-
-          p.life -= 1;
-          p.a = Math.max(0, p.life / p.maxLife);
-
+          fxCtx.fillStyle = `hsla(${p.h},95%,60%,${p.life / 60})`;
           fxCtx.beginPath();
-          fxCtx.fillStyle = `hsla(${p.h}, 95%, 60%, ${p.a})`;
           fxCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
           fxCtx.fill();
 
@@ -347,7 +308,7 @@
     function celebrateWin() {
       launchFireworks(3200);
       launchConfetti(3600);
-      showWinImage();
+      setTimeout(showWinCard, 3600);
     }
 
     function checkAnswer() {
@@ -355,10 +316,14 @@
       if (!value) return;
 
       if (value === normalize(SECRET)) {
+        if (solved) return;
+        solved = true;
+
         wrap.classList.remove("bad");
         wrap.classList.add("ok");
         msg.textContent = "🎉 Bravo, tu as trouvé la bonne réponse !";
-        celebrateWin(); // 🎆🎉🖼️
+
+        celebrateWin();
       } else {
         wrap.classList.remove("ok");
         wrap.classList.add("bad");
@@ -366,11 +331,10 @@
       }
     }
 
-    // 🔑 Validation uniquement avec ENTER
     input.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
         checkAnswer();
-      } else {
+      } else if (!solved) {
         resetState();
       }
     });
@@ -379,6 +343,7 @@
   </script>
 </body>
 </html>
+
 
 
 </body>
