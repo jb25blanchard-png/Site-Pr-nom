@@ -53,27 +53,39 @@
       to { transform: translateY(110vh) rotate(540deg); opacity: 0.25; }
     }
 
-    .winCard {
+    /* Overlay victoire (clic en dehors pour fermer) */
+    .winOverlay {
       position: fixed;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%) scale(0.92);
+      inset: 0;
+      background: rgba(0,0,0,0.35);
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+      box-sizing: border-box;
+    }
+    .winOverlay.show { display: flex; }
+
+    .winCard {
+      position: relative;
+      transform: scale(0.92);
       opacity: 0;
       pointer-events: none;
-      z-index: 10000;
       transition: 220ms ease;
       background: rgba(255,255,255,0.92);
       border: 1px solid rgba(0,0,0,0.12);
       border-radius: 18px;
       padding: 12px;
-      max-width: min(420px, 84vw);
+      max-width: min(420px, 92vw);
       box-shadow: 0 18px 60px rgba(0,0,0,0.22);
     }
     .winCard.show {
-  pointer-events: auto;
-}
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: auto;
+    }
 
-    .winCard.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
     .winCard img { display: block; width: 100%; height: auto; border-radius: 14px; }
 
     .winText {
@@ -149,121 +161,98 @@
       cursor: pointer;
       color: #444;
       line-height: 1;
+      z-index: 2;
     }
     .close-win:hover { color: #000; }
+
+    /* Bouton solutions */
     .show-solutions-btn {
-  margin-top: 10px;
-  width: 100%;
-  padding: 12px 12px;
-  border: none;
-  border-radius: 14px;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: 650;
-  background: #111;
-  color: #fff;
-}
+      margin-top: 10px;
+      width: 100%;
+      padding: 12px 12px;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 650;
+      background: #111;
+      color: #fff;
+    }
+    .show-solutions-btn:hover { filter: brightness(1.05); }
 
-.show-solutions-btn:hover {
-  filter: brightness(1.05);
-}
+    /* Solutions */
+    .solutions.hidden { display: none; }
 
-.solutions.hidden {
-  display: none;
-}
+    .solutions {
+      max-width: 820px;
+      margin: 22px auto 0;
+      padding: 14px;
+      border: 1px solid #e5e7eb;
+      border-radius: 18px;
+      background: #fff;
+    }
 
-.solutions {
-  max-width: 820px;
-  margin: 22px auto 0;
-  padding: 14px;
-  border: 1px solid #e5e7eb;
-  border-radius: 18px;
-  background: #fff;
-}
+    .solutionsHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
 
-.solutionsHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 10px;
-}
+    .solutionsHeader h2 { margin: 0; font-size: 18px; }
 
-.solutionsHeader h2 {
-  margin: 0;
-  font-size: 18px;
-}
+    .solutionsActions { display: flex; gap: 8px; }
 
-.solutionsActions {
-  display: flex;
-  gap: 8px;
-}
+    .solutionsActions button {
+      padding: 9px 10px;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      background: #f8fafc;
+      cursor: pointer;
+      font-size: 14px;
+    }
 
-.solutionsActions button {
-  padding: 9px 10px;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  background: #f8fafc;
-  cursor: pointer;
-  font-size: 14px;
-}
+    .solItem {
+      border: 1px solid #eef0f3;
+      border-radius: 14px;
+      margin: 10px 0;
+      overflow: hidden;
+      background: #fafafa;
+    }
 
-.solItem {
-  border: 1px solid #eef0f3;
-  border-radius: 14px;
-  margin: 10px 0;
-  overflow: hidden;
-  background: #fafafa;
-}
+    .solItem summary {
+      cursor: pointer;
+      padding: 12px 14px;
+      font-weight: 700;
+      list-style: none;
+    }
+    .solItem summary::-webkit-details-marker { display: none; }
 
-.solItem summary {
-  cursor: pointer;
-  padding: 12px 14px;
-  font-weight: 700;
-  list-style: none;
-}
+    .solItem summary::after {
+      content: "▾";
+      float: right;
+      transition: transform 160ms ease;
+    }
+    .solItem[open] summary::after { transform: rotate(180deg); }
 
-.solItem summary::-webkit-details-marker { display: none; }
+    .solContent {
+      padding: 12px 14px 14px;
+      background: #fff;
+      border-top: 1px solid #eef0f3;
+      line-height: 1.6;
+      font-size: 16px;
+    }
+    .solContent p { margin: 0 0 10px; }
+    .solContent p:last-child { margin-bottom: 0; }
 
-.solItem summary::after {
-  content: "▾";
-  float: right;
-  transition: transform 160ms ease;
-}
-
-.solItem[open] summary::after { transform: rotate(180deg); }
-
-.solContent {
-  padding: 12px 14px 14px;
-  background: #fff;
-  border-top: 1px solid #eef0f3;
-  line-height: 1.6;
-  font-size: 16px;
-}
-
-.solContent p { margin: 0 0 10px; }
-.solContent p:last-child { margin-bottom: 0; }
-
-@media (max-width: 480px) {
-  .solutions { padding: 12px; border-radius: 16px; }
-  .solContent { font-size: 15px; }
-  .show-solutions-btn { font-size: 15px; }
-}
-.winOverlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.35);
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.winOverlay.hidden {
-  display: none;
-}
-
+    @media (max-width: 480px) {
+      .solutions { padding: 12px; border-radius: 16px; }
+      .solContent { font-size: 15px; }
+      .show-solutions-btn { font-size: 15px; }
+      .winText { font-size: 16px; }
+    }
   </style>
 </head>
 
@@ -286,103 +275,99 @@
 
   <canvas id="fx"></canvas>
   <div id="confetti"></div>
- 
-<div id="winOverlay" class="winOverlay hidden">
-  <div id="winCard" class="winCard" aria-hidden="true">
-    <button id="closeWinCard" class="close-win" aria-label="Fermer">×</button>
-    <img id="winImg" alt="Bravo" />
-    <p class="winText">Un prénom est révélé. Une autre étoile reste à nommer.</p>
-    <button id="showSolutionsBtn" class="show-solutions-btn" type="button">
-  Découvrir les réponses aux énigmes
-</button>
-  </div>
-</div>
 
-  
+  <!-- Overlay victoire + carte -->
+  <div id="winOverlay" class="winOverlay" aria-hidden="true">
+    <div id="winCard" class="winCard">
+      <button id="closeWinCard" class="close-win" aria-label="Fermer" type="button">×</button>
+      <img id="winImg" alt="Bravo" />
+      <p class="winText">Un prénom est révélé. Une autre étoile reste à nommer.</p>
+      <button id="showSolutionsBtn" class="show-solutions-btn" type="button">
+        Découvrir les réponses aux énigmes
+      </button>
+    </div>
+  </div>
+
+  <!-- Solutions (restent visibles même si on ferme l'image) -->
   <section id="solutions" class="solutions hidden" aria-label="Réponses aux énigmes">
-  <div class="solutionsHeader">
-    <h2>📜 Réponses aux énigmes</h2>
-    <div class="solutionsActions">
-      <button id="openAllSolutions" type="button">Tout ouvrir</button>
-      <button id="closeAllSolutions" type="button">Tout fermer</button>
+    <div class="solutionsHeader">
+      <h2>📜 Réponses aux énigmes</h2>
+      <div class="solutionsActions">
+        <button id="openAllSolutions" type="button">Tout ouvrir</button>
+        <button id="closeAllSolutions" type="button">Tout fermer</button>
+      </div>
     </div>
-  </div>
 
-  <details class="solItem">
-    <summary>Énigme 1 — Carte postale / Bergame / Bergamesque</summary>
-    <div class="solContent">
-      <p>
-        Recto de la carte postale : Il s’agit d’une célèbre place de Bergame, ville d’Italie,
-        dont Diane Tell parle dans sa chanson « Si j’étais un homme ».
-        C’est également un lien avec la musique « Clair de Lune » de Debussy puisque ce morceau
-        est le troisième mouvement de la suite Bergamesque.
-      </p>
-      <p>
-        Sur le cloché de la place, on trouve un QR Code qui amène vers une vidéo d’un dessin de
-        montre affichant un autre lien sous le chiffre 12 et bientôt 16:05 heure du lancement du
-        concours équestre « Le Grand Prix de Diane ».
-      </p>
-      <p>
-        La montre est également un clin d’oeil à Longines, marque de montre et partenaire historique
-        de cet événement. Le lien se situant sous le 12 amène à une vidéo qui correspond au
-        rassemblement Chantilly Arts & Élégance qui se tient (comme son nom l’indique) à Chantilly,
-        lieu où se tient également le Grand Prix de Diane.
-      </p>
-    </div>
-  </details>
+    <details class="solItem">
+      <summary>Énigme 1 — Carte postale / Bergame / Bergamesque</summary>
+      <div class="solContent">
+        <p>
+          Recto de la carte postale : Il s’agit d’une célèbre place de Bergame, ville d’Italie,
+          dont Diane Tell parle dans sa chanson « Si j’étais un homme ». C’est également un lien
+          avec la musique « Clair de Lune » de Debussy puisque ce morceau est le troisième mouvement
+          de la suite Bergamesque.
+        </p>
+        <p>
+          Sur le cloché de la place, on trouve un QR Code qui amène vers une vidéo d’un dessin de
+          montre affichant un autre lien sous le chiffre 12 et bientôt 16:05 heure du lancement du
+          concours équestre « Le Grand Prix de Diane ».
+        </p>
+        <p>
+          La montre est également un clin d’oeil à Longines, marque de montre et partenaire historique
+          de cet événement. Le lien se situant sous le 12 amène à une vidéo qui correspond au
+          rassemblement Chantilly Arts & Élégance qui se tient (comme son nom l’indique) à Chantilly,
+          lieu où se tient également le Grand Prix de Diane.
+        </p>
+      </div>
+    </details>
 
-  <details class="solItem">
-    <summary>Énigme 2 — Acrostiche / M-5 / Clair de Lune</summary>
-    <div class="solContent">
-      <p>
-        L’énigme en noir est une acrostiche. Il faut prendre les premiers caractères de chaque début
-        de phrase. La mention M-5 correspond au moment où chacun a reçu sa carte postale et un
-        décompte avant la naissance, c’est aussi la clé pour déchiffrer cette acrostiche puisque en
-        soustrayant 5 à chaque caractère, on obtient la partie manquante du lien internet écrit à
-        la verticale à coté du texte.
-      </p>
-      <p>
-        Ce lien amène à la musique « Clair de Lune » de Debussy. Ce morceau fait référence à la Lune
-        dont Artemis (autre nom pour Diane) est la déesse.
-      </p>
-    </div>
-  </details>
+    <details class="solItem">
+      <summary>Énigme 2 — Acrostiche / M-5 / Clair de Lune</summary>
+      <div class="solContent">
+        <p>
+          L’énigme en noir est une acrostiche. Il faut prendre les premiers caractères de chaque début
+          de phrase. La mention M-5 correspond au moment où chacun a reçu sa carte postale et un
+          décompte avant la naissance, c’est aussi la clé pour déchiffrer cette acrostiche puisque en
+          soustrayant 5 à chaque caractère, on obtient la partie manquante du lien internet écrit à
+          la verticale à coté du texte.
+        </p>
+        <p>
+          Ce lien amène à la musique « Clair de Lune » de Debussy. Ce morceau fait référence à la Lune
+          dont Artemis (autre nom pour Diane) est la déesse.
+        </p>
+      </div>
+    </details>
 
-  <details class="solItem">
-    <summary>Énigme 3 — Timbre / Cervidé</summary>
-    <div class="solContent">
-      <p>
-        Le timbre est une image de cervidé, Diane étant la représentation de la déesse de la chasse.
-      </p>
-    </div>
-  </details>
+    <details class="solItem">
+      <summary>Énigme 3 — Timbre / Cervidé</summary>
+      <div class="solContent">
+        <p>Le timbre est une image de cervidé, Diane étant la représentation de la déesse de la chasse.</p>
+      </div>
+    </details>
 
-  <details class="solItem">
-    <summary>Énigme 4 — Apollo / Mer de la Tranquillité / Océan des Tempêtes</summary>
-    <div class="solContent">
-      <p>
-        L’énigme écrite en verte fait référence aux missions Apollo, le lieu d’alunissage de Apollo 11
-        était la mer de la tranquillité et l’océan des tempêtes pour Apollo 12.
-        Autre référence à la Lune et aux futures missions Artemis et du retour de l’humain sur la Lune.
-      </p>
-    </div>
-  </details>
+    <details class="solItem">
+      <summary>Énigme 4 — Apollo / Mer de la Tranquillité / Océan des Tempêtes</summary>
+      <div class="solContent">
+        <p>
+          L’énigme écrite en verte fait référence aux missions Apollo, le lieu d’alunissage de Apollo 11
+          était la mer de la tranquillité et l’océan des tempêtes pour Apollo 12. Autre référence à la Lune
+          et aux futures missions Artemis et du retour de l’humain sur la Lune.
+        </p>
+      </div>
+    </details>
 
-  <details class="solItem">
-    <summary>Énigme 5 — Chaîne YouTube / Luminae-X0</summary>
-    <div class="solContent">
-      <p>
-        La chaine YouTube comporte deux indices, le nom « Luminae-X0 »; Luminae évoque la lumière et
-        donc la naissance et « ae » est un ancien pluriel féminin.
-        X0 correspond à X (le chromosome féminin) et 0 au début de tout donc à la naissance.
-      </p>
-      <p>
-        La photo de profil de la chaine YouTube est une signe féminin ancestral.
-      </p>
-    </div>
-  </details>
-</section>
-
+    <details class="solItem">
+      <summary>Énigme 5 — Chaîne YouTube / Luminae-X0</summary>
+      <div class="solContent">
+        <p>
+          La chaine YouTube comporte deux indices, le nom « Luminae-X0 »; Luminae évoque la lumière et
+          donc la naissance et « ae » est un ancien pluriel féminin. X0 correspond à X (le chromosome féminin)
+          et 0 au début de tout donc à la naissance.
+        </p>
+        <p>La photo de profil de la chaine YouTube est une signe féminin ancestral.</p>
+      </div>
+    </details>
+  </section>
 
   <!-- POPUP PRENOM -->
   <div id="nameModal" class="modal hidden">
@@ -401,9 +386,12 @@
     </div>
   </div>
 
-  <!-- SCRIPT PRINCIPAL (jeu + modal) -->
+  <!-- SCRIPT PRINCIPAL -->
   <script>
+    // 🔒 Modifie ici la bonne réponse
     const SECRET = "DIANE";
+
+    // 🖼️ Image affichée à la fin
     const WIN_IMAGE_SRC = "img/etoiles.jpg";
 
     const wrap = document.getElementById("wrap");
@@ -413,44 +401,19 @@
     const fxCanvas = document.getElementById("fx");
     const fxCtx = fxCanvas.getContext("2d");
     const confettiLayer = document.getElementById("confetti");
+
     const winOverlay = document.getElementById("winOverlay");
-const winCard = document.getElementById("winCard");
+    const winCard = document.getElementById("winCard");
     const winImg = document.getElementById("winImg");
-    // --- Solutions ---
-const solutionsSection = document.getElementById("solutions");
-const showSolutionsBtn = document.getElementById("showSolutionsBtn");
-const openAllBtn = document.getElementById("openAllSolutions");
-const closeAllBtn = document.getElementById("closeAllSolutions");
-
-function revealSolutions() {
-  if (!solutionsSection) return;
-  solutionsSection.classList.remove("hidden");
-  solutionsSection.scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
-showSolutionsBtn.addEventListener("click", revealSolutions);
-
-openAllBtn.addEventListener("click", () => {
-  solutionsSection.querySelectorAll("details.solItem").forEach(d => d.open = true);
-});
-
-closeAllBtn.addEventListener("click", () => {
-  solutionsSection.querySelectorAll("details.solItem").forEach(d => d.open = false);
-});
-
-
-    // Croix de fermeture winCard (⚠️ NE PAS redéclarer winCard)
     const closeWinBtn = document.getElementById("closeWinCard");
-   // ✅ fermer en cliquant n'importe où en dehors de la carte
-winOverlay.addEventListener("click", (e) => {
-  // seulement si on clique le fond (pas sur l'image, pas sur les boutons)
-  if (e.target === winOverlay) {
-    resetWinExperience();
-  }
-});
 
+    // Solutions
+    const solutionsSection = document.getElementById("solutions");
+    const showSolutionsBtn = document.getElementById("showSolutionsBtn");
+    const openAllBtn = document.getElementById("openAllSolutions");
+    const closeAllBtn = document.getElementById("closeAllSolutions");
 
-    // Modal elements
+    // Modal prénom
     const modal = document.getElementById("nameModal");
     const nameInput = document.getElementById("playerNameInput");
     const confirmBtn = document.getElementById("confirmBtn");
@@ -458,36 +421,6 @@ winOverlay.addEventListener("click", (e) => {
 
     let solved = false;
     let nameAsked = false;
-
-    function openNameModal() {
-      nameInput.value = "";
-      modal.classList.remove("hidden");
-      nameInput.focus();
-    }
-
-    function closeNameModal() {
-      modal.classList.add("hidden");
-    }
-
-    confirmBtn.addEventListener("click", () => {
-      const name = nameInput.value.trim();
-      if (name && window.__addWinner) window.__addWinner(name);
-      closeNameModal();
-      input.focus();
-    });
-
-    skipBtn.addEventListener("click", () => {
-      closeNameModal();
-      input.focus();
-    });
-
-    // Enter dans le champ prénom = valider
-    nameInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        confirmBtn.click();
-      }
-    });
 
     function resizeFx() {
       fxCanvas.width = window.innerWidth;
@@ -522,15 +455,86 @@ winOverlay.addEventListener("click", (e) => {
       return failureMessages[Math.floor(Math.random() * failureMessages.length)];
     }
 
+    // --- Solutions actions ---
+    function revealSolutions() {
+      solutionsSection.classList.remove("hidden");
+      solutionsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    showSolutionsBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      revealSolutions();
+    });
+
+    openAllBtn.addEventListener("click", () => {
+      solutionsSection.querySelectorAll("details.solItem").forEach(d => d.open = true);
+    });
+
+    closeAllBtn.addEventListener("click", () => {
+      solutionsSection.querySelectorAll("details.solItem").forEach(d => d.open = false);
+    });
+
+    // --- Modal prénom ---
+    function openNameModal() {
+      nameInput.value = "";
+      modal.classList.remove("hidden");
+      nameInput.focus();
+    }
+    function closeNameModal() {
+      modal.classList.add("hidden");
+    }
+
+    confirmBtn.addEventListener("click", () => {
+      const name = nameInput.value.trim();
+      if (name && window.__addWinner) window.__addWinner(name);
+      closeNameModal();
+      input.focus();
+    });
+
+    skipBtn.addEventListener("click", () => {
+      closeNameModal();
+      input.focus();
+    });
+
+    nameInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        confirmBtn.click();
+      }
+    });
+
+    // --- Win overlay close behavior ---
+    function closeWin() {
+      winOverlay.classList.remove("show");
+      winOverlay.setAttribute("aria-hidden", "true");
+      winCard.classList.remove("show");
+      winCard.setAttribute("aria-hidden", "true");
+      input.focus();
+    }
+
+    closeWinBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      closeWin();
+    });
+
+    // clic en dehors de la carte
+    winOverlay.addEventListener("click", (e) => {
+      if (e.target === winOverlay) closeWin();
+    });
+
+    // clic dans la carte = ne pas fermer
+    winCard.addEventListener("click", (e) => {
+      e.stopPropagation();
+    });
+
     function showWinCard() {
-  winImg.src = WIN_IMAGE_SRC;
-
-  // ✅ afficher le fond cliquable + la carte
-  winOverlay.classList.remove("hidden");
-  winCard.classList.add("show");
-  winCard.setAttribute("aria-hidden", "false");
-}
-
+      winImg.src = WIN_IMAGE_SRC;
+      winOverlay.classList.add("show");
+      winOverlay.setAttribute("aria-hidden", "false");
+      winCard.classList.add("show");
+      winCard.setAttribute("aria-hidden", "false");
+    }
 
     function launchConfetti(durationMs = 3600) {
       confettiLayer.innerHTML = "";
@@ -553,13 +557,13 @@ winOverlay.addEventListener("click", (e) => {
           c.className = "confetto";
           const size = 6 + Math.random() * 10;
           c.style.width = size + "px";
-          c.style.height = size * 1.4 + "px";
-          c.style.left = Math.random() * 100 + "vw";
+          c.style.height = (size * 1.4) + "px";
+          c.style.left = (Math.random() * 100) + "vw";
           c.style.background = colors[Math.floor(Math.random() * colors.length)];
-          c.style.animationDuration = 1100 + Math.random() * 1700 + "ms";
-          c.style.animationDelay = Math.random() * 120 + "ms";
+          c.style.animationDuration = (1100 + Math.random() * 1700) + "ms";
+          c.style.animationDelay = (Math.random() * 120) + "ms";
           confettiLayer.appendChild(c);
-          setTimeout(() => c.remove(), 2200);
+          setTimeout(() => c.remove(), 2400);
         }
 
         requestAnimationFrame(spawnBatch);
@@ -570,6 +574,7 @@ winOverlay.addEventListener("click", (e) => {
 
     function launchFireworks(durationMs = 3200) {
       fxCanvas.style.display = "block";
+
       const particles = [];
       const start = performance.now();
 
@@ -629,39 +634,11 @@ winOverlay.addEventListener("click", (e) => {
       requestAnimationFrame(tick);
     }
 
-    function resetWinExperience() {
-  // autoriser une nouvelle victoire
-  solved = false;
-  nameAsked = false;
-
- // remettre la carte + cacher l'overlay
-winCard.classList.remove("show");
-winCard.setAttribute("aria-hidden", "true");
-winOverlay.classList.add("hidden");
-
-  // nettoyer les effets
-  confettiLayer.style.display = "none";
-  confettiLayer.innerHTML = "";
-
-  fxCanvas.style.display = "none";
-  fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
-
-  // enlever l'état vert/rouge + message
-  wrap.classList.remove("ok", "bad");
-  msg.textContent = "";
-
-  // remettre le champ prêt
-  input.value = "";
-  input.focus();
-}
-
-
     function celebrateWin() {
       launchFireworks(3200);
       launchConfetti(3600);
       setTimeout(showWinCard, 3600);
 
-      // Afficher le popup immédiatement après la réussite (une seule fois)
       if (!nameAsked) {
         nameAsked = true;
         openNameModal();
@@ -688,7 +665,7 @@ winOverlay.classList.add("hidden");
       }
     }
 
-    // ✅ ENTER fiabilisé
+    // ENTER = valider
     input.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
         e.preventDefault();
@@ -701,13 +678,14 @@ winOverlay.classList.add("hidden");
     input.focus();
   </script>
 
-  <!-- SCRIPT FIREBASE (module) EN DERNIER -->
+  <!-- SCRIPT FIREBASE (module) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
     import {
       getFirestore,
       collection,
-      addDoc,
+      doc,
+      setDoc,
       serverTimestamp,
       query,
       orderBy,
@@ -750,11 +728,26 @@ winOverlay.classList.add("hidden");
       render(snap.docs.map(doc => doc.data()));
     }
 
+    function nameKey(name) {
+      return (name || "")
+        .trim()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 40);
+    }
+
     async function addWinner(name) {
       const clean = (name || "").trim().slice(0, 30);
       if (!clean) return;
 
-      await addDoc(collection(db, "winners"), {
+      const id = nameKey(clean);
+      if (!id) return;
+
+      // docId fixe => pas de doublon (un 2e envoi serait un "update", bloqué par les règles)
+      await setDoc(doc(db, "winners", id), {
         name: clean,
         foundAt: serverTimestamp()
       });
@@ -767,3 +760,4 @@ winOverlay.classList.add("hidden");
   </script>
 </body>
 </html>
+
