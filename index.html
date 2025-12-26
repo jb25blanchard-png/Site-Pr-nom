@@ -151,6 +151,106 @@
       line-height: 1;
     }
     .close-win:hover { color: #000; }
+    .show-solutions-btn {
+  margin-top: 10px;
+  width: 100%;
+  padding: 12px 12px;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 650;
+  background: #111;
+  color: #fff;
+}
+
+.show-solutions-btn:hover {
+  filter: brightness(1.05);
+}
+
+.solutions.hidden {
+  display: none;
+}
+
+.solutions {
+  max-width: 820px;
+  margin: 22px auto 0;
+  padding: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  background: #fff;
+}
+
+.solutionsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.solutionsHeader h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.solutionsActions {
+  display: flex;
+  gap: 8px;
+}
+
+.solutionsActions button {
+  padding: 9px 10px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #f8fafc;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.solItem {
+  border: 1px solid #eef0f3;
+  border-radius: 14px;
+  margin: 10px 0;
+  overflow: hidden;
+  background: #fafafa;
+}
+
+.solItem summary {
+  cursor: pointer;
+  padding: 12px 14px;
+  font-weight: 700;
+  list-style: none;
+}
+
+.solItem summary::-webkit-details-marker { display: none; }
+
+.solItem summary::after {
+  content: "▾";
+  float: right;
+  transition: transform 160ms ease;
+}
+
+.solItem[open] summary::after { transform: rotate(180deg); }
+
+.solContent {
+  padding: 12px 14px 14px;
+  background: #fff;
+  border-top: 1px solid #eef0f3;
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+.solContent p { margin: 0 0 10px; }
+.solContent p:last-child { margin-bottom: 0; }
+
+@media (max-width: 480px) {
+  .solutions { padding: 12px; border-radius: 16px; }
+  .solContent { font-size: 15px; }
+  .show-solutions-btn { font-size: 15px; }
+}
+
   </style>
 </head>
 
@@ -178,7 +278,94 @@
     <button id="closeWinCard" class="close-win" aria-label="Fermer" type="button">×</button>
     <img id="winImg" alt="Bravo" />
     <p class="winText">Un prénom est révélé. Une autre étoile reste à nommer.</p>
+    <button id="showSolutionsBtn" class="show-solutions-btn" type="button">
+  Découvrir les réponses aux énigmes
+</button>
   </div>
+  <section id="solutions" class="solutions hidden" aria-label="Réponses aux énigmes">
+  <div class="solutionsHeader">
+    <h2>📜 Réponses aux énigmes</h2>
+    <div class="solutionsActions">
+      <button id="openAllSolutions" type="button">Tout ouvrir</button>
+      <button id="closeAllSolutions" type="button">Tout fermer</button>
+    </div>
+  </div>
+
+  <details class="solItem">
+    <summary>Énigme 1 — Carte postale / Bergame / Bergamesque</summary>
+    <div class="solContent">
+      <p>
+        Recto de la carte postale : Il s’agit d’une célèbre place de Bergame, ville d’Italie,
+        dont Diane Tell parle dans sa chanson « Si j’étais un homme ».
+        C’est également un lien avec la musique « Clair de Lune » de Debussy puisque ce morceau
+        est le troisième mouvement de la suite Bergamesque.
+      </p>
+      <p>
+        Sur le cloché de la place, on trouve un QR Code qui amène vers une vidéo d’un dessin de
+        montre affichant un autre lien sous le chiffre 12 et bientôt 16:05 heure du lancement du
+        concours équestre « Le Grand Prix de Diane ».
+      </p>
+      <p>
+        La montre est également un clin d’oeil à Longines, marque de montre et partenaire historique
+        de cet événement. Le lien se situant sous le 12 amène à une vidéo qui correspond au
+        rassemblement Chantilly Arts & Élégance qui se tient (comme son nom l’indique) à Chantilly,
+        lieu où se tient également le Grand Prix de Diane.
+      </p>
+    </div>
+  </details>
+
+  <details class="solItem">
+    <summary>Énigme 2 — Acrostiche / M-5 / Clair de Lune</summary>
+    <div class="solContent">
+      <p>
+        L’énigme en noir est une acrostiche. Il faut prendre les premiers caractères de chaque début
+        de phrase. La mention M-5 correspond au moment où chacun a reçu sa carte postale et un
+        décompte avant la naissance, c’est aussi la clé pour déchiffrer cette acrostiche puisque en
+        soustrayant 5 à chaque caractère, on obtient la partie manquante du lien internet écrit à
+        la verticale à coté du texte.
+      </p>
+      <p>
+        Ce lien amène à la musique « Clair de Lune » de Debussy. Ce morceau fait référence à la Lune
+        dont Artemis (autre nom pour Diane) est la déesse.
+      </p>
+    </div>
+  </details>
+
+  <details class="solItem">
+    <summary>Énigme 3 — Timbre / Cervidé</summary>
+    <div class="solContent">
+      <p>
+        Le timbre est une image de cervidé, Diane étant la représentation de la déesse de la chasse.
+      </p>
+    </div>
+  </details>
+
+  <details class="solItem">
+    <summary>Énigme 4 — Apollo / Mer de la Tranquillité / Océan des Tempêtes</summary>
+    <div class="solContent">
+      <p>
+        L’énigme écrite en verte fait référence aux missions Apollo, le lieu d’alunissage de Apollo 11
+        était la mer de la tranquillité et l’océan des tempêtes pour Apollo 12.
+        Autre référence à la Lune et aux futures missions Artemis et du retour de l’humain sur la Lune.
+      </p>
+    </div>
+  </details>
+
+  <details class="solItem">
+    <summary>Énigme 5 — Chaîne YouTube / Luminae-X0</summary>
+    <div class="solContent">
+      <p>
+        La chaine YouTube comporte deux indices, le nom « Luminae-X0 »; Luminae évoque la lumière et
+        donc la naissance et « ae » est un ancien pluriel féminin.
+        X0 correspond à X (le chromosome féminin) et 0 au début de tout donc à la naissance.
+      </p>
+      <p>
+        La photo de profil de la chaine YouTube est une signe féminin ancestral.
+      </p>
+    </div>
+  </details>
+</section>
+
 
   <!-- POPUP PRENOM -->
   <div id="nameModal" class="modal hidden">
@@ -211,6 +398,28 @@
     const confettiLayer = document.getElementById("confetti");
     const winCard = document.getElementById("winCard");
     const winImg = document.getElementById("winImg");
+    // --- Solutions ---
+const solutionsSection = document.getElementById("solutions");
+const showSolutionsBtn = document.getElementById("showSolutionsBtn");
+const openAllBtn = document.getElementById("openAllSolutions");
+const closeAllBtn = document.getElementById("closeAllSolutions");
+
+function revealSolutions() {
+  if (!solutionsSection) return;
+  solutionsSection.classList.remove("hidden");
+  solutionsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+showSolutionsBtn.addEventListener("click", revealSolutions);
+
+openAllBtn.addEventListener("click", () => {
+  solutionsSection.querySelectorAll("details.solItem").forEach(d => d.open = true);
+});
+
+closeAllBtn.addEventListener("click", () => {
+  solutionsSection.querySelectorAll("details.solItem").forEach(d => d.open = false);
+});
+
 
     // Croix de fermeture winCard (⚠️ NE PAS redéclarer winCard)
     const closeWinBtn = document.getElementById("closeWinCard");
