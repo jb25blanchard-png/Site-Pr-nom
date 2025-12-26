@@ -213,6 +213,14 @@
     const confettiLayer = document.getElementById("confetti");
     const winCard = document.getElementById("winCard");
     const winImg = document.getElementById("winImg");
+    const closeWinBtn = document.getElementById("closeWinCard");
+
+closeWinBtn.addEventListener("click", () => {
+  winCard.classList.remove("show");
+  winCard.setAttribute("aria-hidden", "true");
+  input.focus(); // ✅ revient au champ
+});
+
 
     // Modal elements
     const modal = document.getElementById("nameModal");
@@ -427,8 +435,6 @@
     });
 
     input.focus();
-    const winCard = document.getElementById("winCard");
-const closeWinBtn = document.getElementById("closeWinCard");
 
 closeWinBtn.addEventListener("click", () => {
   winCard.classList.remove("show");
