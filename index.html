@@ -503,16 +503,18 @@
       }
     });
 
-    // --- Win overlay close behavior ---
-    function closeWin() {
+    // --- Win overlay close behavior (PROPRE, SANS DOUBLONS) ---
+function closeWin() {
   // autoriser une nouvelle validation
   solved = false;
   nameAsked = false;
 
-  // fermer l’overlay + la carte
+  // fermer overlay + carte (IMPORTANT : enlever .show)
+  winOverlay.classList.remove("show");
+  winOverlay.setAttribute("aria-hidden", "true");
+
   winCard.classList.remove("show");
   winCard.setAttribute("aria-hidden", "true");
-  winOverlay.classList.add("hidden");
 
   // arrêter les effets visuels
   confettiLayer.style.display = "none";
@@ -527,6 +529,24 @@
   input.value = "";
   input.focus();
 }
+
+// croix = fermer
+closeWinBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  closeWin();
+});
+
+// clic en dehors de la carte = fermer
+winOverlay.addEventListener("click", (e) => {
+  if (e.target === winOverlay) closeWin();
+});
+
+// clic dans la carte = ne pas fermer
+winCard.addEventListener("click", (e) => {
+  e.stopPropagation();
+});
+
 winOverlay.addEventListener("click", (e) => {
   if (e.target === winOverlay) {
     closeWin();
@@ -660,32 +680,6 @@ winCard.addEventListener("click", (e) => {
 
       requestAnimationFrame(tick);
     }
-
-    function resetWinExperience() {
-  solved = false;
-  nameAsked = false;
-
-  // fermer l’overlay
-  winOverlay.classList.remove("show");
-  winOverlay.setAttribute("aria-hidden", "true");
-
-  winCard.classList.remove("show");
-  winCard.setAttribute("aria-hidden", "true");
-
-  // nettoyer les effets
-  confettiLayer.style.display = "none";
-  confettiLayer.innerHTML = "";
-
-  fxCanvas.style.display = "none";
-  fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
-
-  // remettre le champ prêt
-  wrap.classList.remove("ok", "bad");
-  msg.textContent = "";
-  input.value = "";
-  input.focus();
-}
-
 
     function celebrateWin() {
       launchFireworks(3200);
