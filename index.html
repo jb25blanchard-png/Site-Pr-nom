@@ -6,10 +6,7 @@
   <title>Mini site</title>
 
   <style>
-    body {
-      font-family: system-ui, Arial, sans-serif;
-      margin: 32px;
-    }
+    body { font-family: system-ui, Arial, sans-serif; margin: 32px; }
 
     .box {
       max-width: 520px;
@@ -32,44 +29,14 @@
       transition: border-color 150ms, box-shadow 150ms;
     }
 
-    .ok input#answer {
-      border-color: #1a7f37;
-      box-shadow: 0 0 18px rgba(26,127,55,.35);
-    }
+    .ok input#answer { border-color: #1a7f37; box-shadow: 0 0 18px rgba(26,127,55,.35); }
+    .bad input#answer { border-color: #d1242f; box-shadow: 0 0 18px rgba(209,36,47,.25); }
 
-    .bad input#answer {
-      border-color: #d1242f;
-      box-shadow: 0 0 18px rgba(209,36,47,.25);
-    }
+    .msg { margin-top: 14px; font-size: 18px; min-height: 26px; }
+    .hint { margin-top: 10px; font-size: 14px; color: #666; }
 
-    .msg {
-      margin-top: 14px;
-      font-size: 18px;
-      min-height: 26px;
-    }
-
-    .hint {
-      margin-top: 10px;
-      font-size: 14px;
-      color: #666;
-    }
-
-    #fx {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 9998;
-      display: none;
-    }
-
-    #confetti {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      overflow: hidden;
-      z-index: 9999;
-      display: none;
-    }
+    #fx { position: fixed; inset: 0; pointer-events: none; z-index: 9998; display: none; }
+    #confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 9999; display: none; }
 
     .confetto {
       position: absolute;
@@ -83,10 +50,7 @@
     }
 
     @keyframes confettiFall {
-      to {
-        transform: translateY(110vh) rotate(540deg);
-        opacity: 0.25;
-      }
+      to { transform: translateY(110vh) rotate(540deg); opacity: 0.25; }
     }
 
     .winCard {
@@ -106,17 +70,8 @@
       box-shadow: 0 18px 60px rgba(0,0,0,0.22);
     }
 
-    .winCard.show {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-    }
-
-    .winCard img {
-      display: block;
-      width: 100%;
-      height: auto;
-      border-radius: 14px;
-    }
+    .winCard.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    .winCard img { display: block; width: 100%; height: auto; border-radius: 14px; }
 
     .winText {
       margin: 14px 6px 4px;
@@ -126,20 +81,62 @@
       color: #111;
     }
 
-    #leaderboard {
-  margin-top: 16px;
-  padding-left: 20px;
-  font-size: 16px;
-}
+    #leaderboard { margin-top: 16px; padding-left: 20px; font-size: 16px; }
+    #leaderboard li { margin-bottom: 6px; }
 
-#leaderboard li {
-  margin-bottom: 6px;
-}
+    /* Modal (popup prénom) */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 20000;
+    }
+    .modal.hidden { display: none; }
 
+    .modal-box {
+      background: white;
+      padding: 20px;
+      border-radius: 14px;
+      width: min(320px, 90%);
+      text-align: center;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+    }
+
+    .modal-box input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .modal-actions button {
+      flex: 1;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    #confirmBtn { background: #22c55e; color: white; }
+    #skipBtn { background: #e5e7eb; }
   </style>
 </head>
-<body>
 
+<body>
   <h1>Entre la réponse</h1>
 
   <div class="box" id="wrap">
@@ -149,13 +146,12 @@
       placeholder="Tape ta réponse puis appuie sur ENTER"
       autocomplete="off"
     />
-
     <div class="msg" id="msg"></div>
     <div class="hint">Validation uniquement avec la touche ENTER</div>
   </div>
 
   <h2>Ils ont trouvé 👇</h2>
-<ol id="leaderboard"></ol>
+  <ol id="leaderboard"></ol>
 
   <canvas id="fx"></canvas>
   <div id="confetti"></div>
@@ -165,10 +161,26 @@
     <p class="winText">Un prénom est révélé. Une autre étoile reste à nommer.</p>
   </div>
 
+  <!-- POPUP PRENOM (doit être AVANT le script principal) -->
+  <div id="nameModal" class="modal hidden">
+    <div class="modal-box">
+      <p>Bravo 🎉 Quel est ton prénom ?</p>
+      <input
+        id="playerNameInput"
+        type="text"
+        placeholder="Entre ton prénom"
+        maxlength="30"
+      />
+      <div class="modal-actions">
+        <button id="skipBtn" type="button">Passer</button>
+        <button id="confirmBtn" type="button">Valider</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT PRINCIPAL (jeu + modal) -->
   <script>
     const SECRET = "DIANE";
-
-    // ✅ chemin avec accent
     const WIN_IMAGE_SRC = "img/etoiles.jpg";
 
     const wrap = document.getElementById("wrap");
@@ -181,7 +193,41 @@
     const winCard = document.getElementById("winCard");
     const winImg = document.getElementById("winImg");
 
+    // Modal elements
+    const modal = document.getElementById("nameModal");
+    const nameInput = document.getElementById("playerNameInput");
+    const confirmBtn = document.getElementById("confirmBtn");
+    const skipBtn = document.getElementById("skipBtn");
+
     let solved = false;
+    let nameAsked = false;
+
+    function openNameModal() {
+      nameInput.value = "";
+      modal.classList.remove("hidden");
+      nameInput.focus();
+    }
+
+    function closeNameModal() {
+      modal.classList.add("hidden");
+    }
+
+    confirmBtn.addEventListener("click", () => {
+      const name = nameInput.value.trim();
+      if (name && window.__addWinner) {
+        window.__addWinner(name);
+      }
+      closeNameModal();
+    });
+
+    skipBtn.addEventListener("click", () => {
+      closeNameModal();
+    });
+
+    // Enter dans le champ prénom = valider
+    nameInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") confirmBtn.click();
+    });
 
     function resizeFx() {
       fxCanvas.width = window.innerWidth;
@@ -323,11 +369,12 @@
       launchFireworks(3200);
       launchConfetti(3600);
       setTimeout(showWinCard, 3600);
-      const name = prompt("Quel est ton prénom ?");
-if (name && window.__addWinner) {
-  window.__addWinner(name);
-}
 
+      // Afficher le popup immédiatement après la réussite (une seule fois)
+      if (!nameAsked) {
+        nameAsked = true;
+        openNameModal();
+      }
     }
 
     function checkAnswer() {
@@ -360,77 +407,71 @@ if (name && window.__addWinner) {
 
     input.focus();
   </script>
+
+  <!-- SCRIPT FIREBASE (module) EN DERNIER -->
   <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-  import {
-    getFirestore,
-    collection,
-    addDoc,
-    serverTimestamp,
-    query,
-    orderBy,
-    limit,
-    getDocs
-  } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      serverTimestamp,
+      query,
+      orderBy,
+      limit,
+      getDocs
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyCyTkLaV66fWGgzEipwUmTGA1ztE5qM9t4",
-    authDomain: "enigmes-prenom.firebaseapp.com",
-    projectId: "enigmes-prenom",
-    storageBucket: "enigmes-prenom.firebasestorage.app",
-    messagingSenderId: "601585511460",
-    appId: "1:601585511460:web:29bc1ce97113c934f83cb1"
-  };
+    const firebaseConfig = {
+      apiKey: "AIzaSyCyTkLaV66fWGgzEipwUmTGA1ztE5qM9t4",
+      authDomain: "enigmes-prenom.firebaseapp.com",
+      projectId: "enigmes-prenom",
+      storageBucket: "enigmes-prenom.firebasestorage.app",
+      messagingSenderId: "601585511460",
+      appId: "1:601585511460:web:29bc1ce97113c934f83cb1"
+    };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-  const leaderboard = document.getElementById("leaderboard");
+    const leaderboard = document.getElementById("leaderboard");
 
-  function render(list) {
-    if (!leaderboard) return;
-    leaderboard.innerHTML = "";
-    list.forEach(item => {
-      const li = document.createElement("li");
-      const d = item.foundAt?.toDate?.();
-      li.textContent = `${item.name} — ${d ? d.toLocaleString("fr-FR") : ""}`;
-      leaderboard.appendChild(li);
-    });
-  }
+    function render(list) {
+      if (!leaderboard) return;
+      leaderboard.innerHTML = "";
+      list.forEach(item => {
+        const li = document.createElement("li");
+        const d = item.foundAt?.toDate?.();
+        li.textContent = `${item.name} — ${d ? d.toLocaleString("fr-FR") : ""}`;
+        leaderboard.appendChild(li);
+      });
+    }
 
-  async function loadWinners() {
-    const q = query(
-      collection(db, "winners"),
-      orderBy("foundAt", "desc"),
-      limit(13)
-    );
-    const snap = await getDocs(q);
-    render(snap.docs.map(doc => doc.data()));
-  }
+    async function loadWinners() {
+      const q = query(
+        collection(db, "winners"),
+        orderBy("foundAt", "desc"),
+        limit(13)
+      );
+      const snap = await getDocs(q);
+      render(snap.docs.map(doc => doc.data()));
+    }
 
-  async function addWinner(name) {
-    const clean = (name || "").trim().slice(0, 30);
-    if (!clean) return;
+    async function addWinner(name) {
+      const clean = (name || "").trim().slice(0, 30);
+      if (!clean) return;
 
-    await addDoc(collection(db, "winners"), {
-      name: clean,
-      foundAt: serverTimestamp()
-    });
+      await addDoc(collection(db, "winners"), {
+        name: clean,
+        foundAt: serverTimestamp()
+      });
 
-    await loadWinners();
-  }
+      await loadWinners();
+    }
 
-  // rendre accessible à ton autre script
-  window.__addWinner = addWinner;
-
-  // charger au démarrage
-  loadWinners();
-</script>
-
+    window.__addWinner = addWinner;
+    loadWinners();
+  </script>
 </body>
 </html>
 
-
-
-</body>
-</html>
