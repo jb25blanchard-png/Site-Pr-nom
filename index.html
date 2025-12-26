@@ -250,6 +250,19 @@
   .solContent { font-size: 15px; }
   .show-solutions-btn { font-size: 15px; }
 }
+.winOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.winOverlay.hidden {
+  display: none;
+}
 
   </style>
 </head>
@@ -273,15 +286,19 @@
 
   <canvas id="fx"></canvas>
   <div id="confetti"></div>
-
+ 
+<div id="winOverlay" class="winOverlay hidden">
   <div id="winCard" class="winCard" aria-hidden="true">
-    <button id="closeWinCard" class="close-win" aria-label="Fermer" type="button">×</button>
+    <button id="closeWinCard" class="close-win" aria-label="Fermer">×</button>
     <img id="winImg" alt="Bravo" />
     <p class="winText">Un prénom est révélé. Une autre étoile reste à nommer.</p>
     <button id="showSolutionsBtn" class="show-solutions-btn" type="button">
   Découvrir les réponses aux énigmes
 </button>
   </div>
+</div>
+
+  
   <section id="solutions" class="solutions hidden" aria-label="Réponses aux énigmes">
   <div class="solutionsHeader">
     <h2>📜 Réponses aux énigmes</h2>
@@ -396,7 +413,8 @@
     const fxCanvas = document.getElementById("fx");
     const fxCtx = fxCanvas.getContext("2d");
     const confettiLayer = document.getElementById("confetti");
-    const winCard = document.getElementById("winCard");
+    const winOverlay = document.getElementById("winOverlay");
+const winCard = document.getElementById("winCard");
     const winImg = document.getElementById("winImg");
     // --- Solutions ---
 const solutionsSection = document.getElementById("solutions");
@@ -423,9 +441,14 @@ closeAllBtn.addEventListener("click", () => {
 
     // Croix de fermeture winCard (⚠️ NE PAS redéclarer winCard)
     const closeWinBtn = document.getElementById("closeWinCard");
-    closeWinBtn.addEventListener("click", () => {
-  resetWinExperience();
+   // ✅ fermer en cliquant n'importe où en dehors de la carte
+winOverlay.addEventListener("click", (e) => {
+  // seulement si on clique le fond (pas sur l'image, pas sur les boutons)
+  if (e.target === winOverlay) {
+    resetWinExperience();
+  }
 });
+
 
     // Modal elements
     const modal = document.getElementById("nameModal");
@@ -500,10 +523,14 @@ closeAllBtn.addEventListener("click", () => {
     }
 
     function showWinCard() {
-      winImg.src = WIN_IMAGE_SRC;
-      winCard.classList.add("show");
-      winCard.setAttribute("aria-hidden", "false");
-    }
+  winImg.src = WIN_IMAGE_SRC;
+
+  // ✅ afficher le fond cliquable + la carte
+  winOverlay.classList.remove("hidden");
+  winCard.classList.add("show");
+  winCard.setAttribute("aria-hidden", "false");
+}
+
 
     function launchConfetti(durationMs = 3600) {
       confettiLayer.innerHTML = "";
@@ -607,9 +634,10 @@ closeAllBtn.addEventListener("click", () => {
   solved = false;
   nameAsked = false;
 
-  // remettre la carte image
-  winCard.classList.remove("show");
-  winCard.setAttribute("aria-hidden", "true");
+ // remettre la carte + cacher l'overlay
+winCard.classList.remove("show");
+winCard.setAttribute("aria-hidden", "true");
+winOverlay.classList.add("hidden");
 
   // nettoyer les effets
   confettiLayer.style.display = "none";
@@ -625,6 +653,10 @@ closeAllBtn.addEventListener("click", () => {
   // remettre le champ prêt
   input.value = "";
   input.focus();
+
+      // optionnel : re-masquer les solutions quand on ferme l'image
+solutionsSection.classList.add("hidden");
+
 }
 
 
