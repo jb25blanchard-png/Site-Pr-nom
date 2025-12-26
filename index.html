@@ -215,10 +215,8 @@
     // Croix de fermeture winCard (⚠️ NE PAS redéclarer winCard)
     const closeWinBtn = document.getElementById("closeWinCard");
     closeWinBtn.addEventListener("click", () => {
-      winCard.classList.remove("show");
-      winCard.setAttribute("aria-hidden", "true");
-      input.focus();
-    });
+  resetWinExperience();
+});
 
     // Modal elements
     const modal = document.getElementById("nameModal");
@@ -394,6 +392,32 @@
 
       requestAnimationFrame(tick);
     }
+
+    function resetWinExperience() {
+  // autoriser une nouvelle victoire
+  solved = false;
+  nameAsked = false;
+
+  // remettre la carte image
+  winCard.classList.remove("show");
+  winCard.setAttribute("aria-hidden", "true");
+
+  // nettoyer les effets
+  confettiLayer.style.display = "none";
+  confettiLayer.innerHTML = "";
+
+  fxCanvas.style.display = "none";
+  fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+
+  // enlever l'état vert/rouge + message
+  wrap.classList.remove("ok", "bad");
+  msg.textContent = "";
+
+  // remettre le champ prêt
+  input.value = "";
+  input.focus();
+}
+
 
     function celebrateWin() {
       launchFireworks(3200);
