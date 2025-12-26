@@ -134,23 +134,20 @@
     #confirmBtn { background: #22c55e; color: white; }
     #skipBtn { background: #e5e7eb; }
 
+    /* Croix pour fermer la winCard */
     .close-win {
-  position: absolute;
-  top: 8px;
-  right: 10px;
-  background: transparent;
-  border: none;
-  font-size: 22px;
-  font-weight: bold;
-  cursor: pointer;
-  color: #444;
-  line-height: 1;
-}
-
-.close-win:hover {
-  color: #000;
-}
-
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      background: transparent;
+      border: none;
+      font-size: 22px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #444;
+      line-height: 1;
+    }
+    .close-win:hover { color: #000; }
   </style>
 </head>
 
@@ -175,14 +172,12 @@
   <div id="confetti"></div>
 
   <div id="winCard" class="winCard" aria-hidden="true">
-  <button id="closeWinCard" class="close-win" aria-label="Fermer">×</button>
+    <button id="closeWinCard" class="close-win" aria-label="Fermer" type="button">×</button>
+    <img id="winImg" alt="Bravo" />
+    <p class="winText">Un prénom est révélé. Une autre étoile reste à nommer.</p>
+  </div>
 
-  <img id="winImg" alt="Bravo" />
-  <p class="winText">Un prénom est révélé. Une autre étoile reste à nommer.</p>
-</div>
-
-
-  <!-- POPUP PRENOM (doit être AVANT le script principal) -->
+  <!-- POPUP PRENOM -->
   <div id="nameModal" class="modal hidden">
     <div class="modal-box">
       <p>Bravo 🎉 Quel est ton prénom ?</p>
@@ -213,14 +208,14 @@
     const confettiLayer = document.getElementById("confetti");
     const winCard = document.getElementById("winCard");
     const winImg = document.getElementById("winImg");
+
+    // Croix de fermeture winCard (⚠️ NE PAS redéclarer winCard)
     const closeWinBtn = document.getElementById("closeWinCard");
-
-closeWinBtn.addEventListener("click", () => {
-  winCard.classList.remove("show");
-  winCard.setAttribute("aria-hidden", "true");
-  input.focus(); // ✅ revient au champ
-});
-
+    closeWinBtn.addEventListener("click", () => {
+      winCard.classList.remove("show");
+      winCard.setAttribute("aria-hidden", "true");
+      input.focus();
+    });
 
     // Modal elements
     const modal = document.getElementById("nameModal");
@@ -243,19 +238,22 @@ closeWinBtn.addEventListener("click", () => {
 
     confirmBtn.addEventListener("click", () => {
       const name = nameInput.value.trim();
-      if (name && window.__addWinner) {
-        window.__addWinner(name);
-      }
+      if (name && window.__addWinner) window.__addWinner(name);
       closeNameModal();
+      input.focus();
     });
 
     skipBtn.addEventListener("click", () => {
       closeNameModal();
+      input.focus();
     });
 
     // Enter dans le champ prénom = valider
     nameInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") confirmBtn.click();
+      if (e.key === "Enter") {
+        e.preventDefault();
+        confirmBtn.click();
+      }
     });
 
     function resizeFx() {
@@ -426,21 +424,17 @@ closeWinBtn.addEventListener("click", () => {
       }
     }
 
+    // ✅ ENTER fiabilisé
     input.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
+        e.preventDefault();
         checkAnswer();
-      } else if (!solved) {
-        resetState();
+        return;
       }
+      if (!solved) resetState();
     });
 
     input.focus();
-
-closeWinBtn.addEventListener("click", () => {
-  winCard.classList.remove("show");
-  winCard.setAttribute("aria-hidden", "true");
-});
-
   </script>
 
   <!-- SCRIPT FIREBASE (module) EN DERNIER -->
@@ -509,4 +503,3 @@ closeWinBtn.addEventListener("click", () => {
   </script>
 </body>
 </html>
-
