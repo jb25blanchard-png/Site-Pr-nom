@@ -323,6 +323,11 @@
       launchFireworks(3200);
       launchConfetti(3600);
       setTimeout(showWinCard, 3600);
+      const name = prompt("Quel est ton prénom ?");
+if (name && window.__addWinner) {
+  window.__addWinner(name);
+}
+
     }
 
     function checkAnswer() {
@@ -355,6 +360,73 @@
 
     input.focus();
   </script>
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+  import {
+    getFirestore,
+    collection,
+    addDoc,
+    serverTimestamp,
+    query,
+    orderBy,
+    limit,
+    getDocs
+  } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCyTkLaV66fWGgzEipwUmTGA1ztE5qM9t4",
+    authDomain: "enigmes-prenom.firebaseapp.com",
+    projectId: "enigmes-prenom",
+    storageBucket: "enigmes-prenom.firebasestorage.app",
+    messagingSenderId: "601585511460",
+    appId: "1:601585511460:web:29bc1ce97113c934f83cb1"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const leaderboard = document.getElementById("leaderboard");
+
+  function render(list) {
+    if (!leaderboard) return;
+    leaderboard.innerHTML = "";
+    list.forEach(item => {
+      const li = document.createElement("li");
+      const d = item.foundAt?.toDate?.();
+      li.textContent = `${item.name} — ${d ? d.toLocaleString("fr-FR") : ""}`;
+      leaderboard.appendChild(li);
+    });
+  }
+
+  async function loadWinners() {
+    const q = query(
+      collection(db, "winners"),
+      orderBy("foundAt", "desc"),
+      limit(13)
+    );
+    const snap = await getDocs(q);
+    render(snap.docs.map(doc => doc.data()));
+  }
+
+  async function addWinner(name) {
+    const clean = (name || "").trim().slice(0, 30);
+    if (!clean) return;
+
+    await addDoc(collection(db, "winners"), {
+      name: clean,
+      foundAt: serverTimestamp()
+    });
+
+    await loadWinners();
+  }
+
+  // rendre accessible à ton autre script
+  window.__addWinner = addWinner;
+
+  // charger au démarrage
+  loadWinners();
+</script>
+
 </body>
 </html>
 
