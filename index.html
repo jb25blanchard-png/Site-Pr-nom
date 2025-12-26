@@ -133,6 +133,24 @@
 
     #confirmBtn { background: #22c55e; color: white; }
     #skipBtn { background: #e5e7eb; }
+
+    .close-win {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #444;
+  line-height: 1;
+}
+
+.close-win:hover {
+  color: #000;
+}
+
   </style>
 </head>
 
@@ -157,9 +175,12 @@
   <div id="confetti"></div>
 
   <div id="winCard" class="winCard" aria-hidden="true">
-    <img id="winImg" alt="Bravo" />
-    <p class="winText">Un prénom est révélé. Une autre étoile reste à nommer.</p>
-  </div>
+  <button id="closeWinCard" class="close-win" aria-label="Fermer">×</button>
+
+  <img id="winImg" alt="Bravo" />
+  <p class="winText">Un prénom est révélé. Une autre étoile reste à nommer.</p>
+</div>
+
 
   <!-- POPUP PRENOM (doit être AVANT le script principal) -->
   <div id="nameModal" class="modal hidden">
@@ -406,6 +427,14 @@
     });
 
     input.focus();
+    const winCard = document.getElementById("winCard");
+const closeWinBtn = document.getElementById("closeWinCard");
+
+closeWinBtn.addEventListener("click", () => {
+  winCard.classList.remove("show");
+  winCard.setAttribute("aria-hidden", "true");
+});
+
   </script>
 
   <!-- SCRIPT FIREBASE (module) EN DERNIER -->
