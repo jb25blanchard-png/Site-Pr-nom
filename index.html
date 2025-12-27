@@ -755,20 +755,30 @@ winCard.addEventListener("click", (e) => {
     const leaderboard = document.getElementById("leaderboard");
 
     function render(list) {
-      if (!leaderboard) return;
-      leaderboard.innerHTML = "";
-      list.forEach(item => {
-        const li = document.createElement("li");
-        const d = item.foundAt?.toDate?.();
-        li.textContent = `${item.name} — ${d ? d.toLocaleString("fr-FR") : ""}`;
-        leaderboard.appendChild(li);
-      });
-    }
+  if (!leaderboard) return;
+  leaderboard.innerHTML = "";
+
+  list.forEach((item, index) => {
+    const li = document.createElement("li");
+
+    const medal =
+      index === 0 ? "🥇 " :
+      index === 1 ? "🥈 " :
+      index === 2 ? "🥉 " : "";
+
+    const d = item.foundAt?.toDate?.();
+    const dateStr = d ? d.toLocaleString("fr-FR") : "";
+
+    li.textContent = `${medal}${item.name}${dateStr ? " — " + dateStr : ""}`;
+    leaderboard.appendChild(li);
+  });
+}
+
 
     async function loadWinners() {
       const q = query(
         collection(db, "winners"),
-        orderBy("foundAt", "desc"),
+        orderBy("foundAt", "asc"),
         limit(13)
       );
       const snap = await getDocs(q);
